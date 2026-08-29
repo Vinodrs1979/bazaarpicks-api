@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BazaarPicks — Curated Amazon Deals</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="logo">Bazaar<span>Picks</span></div>
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchInput" placeholder="Search deals — headphones, serum, shoes...">
+    </div>
+    <div class="topbar-links">
+      <a href="admin.html" class="admin-pill">Admin panel</a>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div>
+    <div class="hero-note">Hand-picked · Updated daily</div>
+    <h1>Best Amazon deals, <em>sorted for you.</em></h1>
+    <p>We track prices across categories and surface only the discounts worth clicking. Every card links straight to the product on Amazon.</p>
+  </div>
+  <div class="ticket">
+    <div class="big" id="heroDiscount">50%</div>
+    <div class="label">Avg. discount live now</div>
+    <div class="dash"></div>
+    <div class="label" id="heroCount">— products tracked</div>
+  </div>
+</section>
+
+<nav class="category-strip" id="categoryStrip"></nav>
+
+<div class="section-heading">
+  <h2 id="gridTitle">All deals</h2>
+  <span class="count" id="gridCount"></span>
+</div>
+
+<div class="grid" id="productGrid"></div>
+<div class="empty-state" id="emptyState" style="display:none;">No products match that search — try a different keyword.</div>
+
+<footer class="site-footer">
+  <div class="disclosure">As an Amazon Associate, this site earns from qualifying purchases. Prices and availability are accurate as of the date shown and are subject to change.</div>
+  <div>© <span id="year"></span> BazaarPicks</div>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — BazaarPicks</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="admin-body">
+
+  <!-- LOGIN -->
+  <div class="login-shell" id="loginShell">
+    <div class="login-card">
+      <div class="logo">Bazaar<span style="color:var(--gold)">Picks</span></div>
+      <p>Admin panel</p>
+      <div class="field">
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" placeholder="Enter admin password">
+      </div>
+      <button class="btn btn-primary" id="loginBtn" style="width:100%;justify-content:center;">Log in</button>
+      <div class="login-error" id="loginError">Wrong password. Try again.</div>
+      <div class="hint">Demo password: bazaar123 — change it in js/data.js before publishing.</div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="admin-shell" id="adminShell" style="display:none;">
+    <aside class="admin-sidebar">
+      <div class="logo">Bazaar<span style="color:var(--gold)">Picks</span></div>
+      <nav>
+        <a class="nav-item active" data-view="dashboard">📊 Dashboard</a>
+        <a class="nav-item" data-view="products">🛒 Products</a>
+        <a class="nav-item" data-view="categories">🏷️ Categories</a>
+        <a class="nav-item" href="index.html" target="_blank">🔗 View site</a>
+        <a class="nav-item" id="logoutBtn">🚪 Log out</a>
+      </nav>
+    </aside>
+
+    <main class="admin-main">
+
+      <!-- DASHBOARD VIEW -->
+      <section id="view-dashboard">
+        <div class="admin-header">
+          <div>
+            <h1>Dashboard</h1>
+            <p>A quick look at your storefront.</p>
+          </div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="num" id="statProducts">0</div>
+            <div class="lbl">Products</div>
+          </div>
+          <div class="stat-card">
+            <div class="num" id="statCategories">0</div>
+            <div class="lbl">Categories</div>
+          </div>
+          <div class="stat-card">
+            <div class="num" id="statDiscount">0%</div>
+            <div class="lbl">Avg. discount</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Recently added products</h3>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+              </tr>
+            </thead>
+            <tbody id="recentProductsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- PRODUCTS VIEW -->
+      <section id="view-products" style="display:none;">
+        <div class="admin-header">
+          <div>
+            <h1>Products</h1>
+            <p>Add, edit, or remove products shown on the storefront.</p>
+          </div>
+          <button class="btn btn-primary" id="addProductBtn">+ Add product</button>
+        </div>
+        <div class="panel">
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Badge</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="productsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- CATEGORIES VIEW -->
+      <section id="view-categories" style="display:none;">
+        <div class="admin-header">
+          <div>
+            <h1>Categories</h1>
+            <p>Organise your storefront's category chips.</p>
+          </div>
+          <button class="btn btn-primary" id="addCategoryBtn">+ Add category</button>
+        </div>
+        <div class="panel">
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Products</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="categoriesBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- PRODUCT MODAL -->
+  <div class="modal-overlay" id="productModalOverlay" style="display:none;">
+    <div class="modal">
+      <h3 id="productModalTitle">Add product</h3>
+      <form id="productForm">
+        <input type="hidden" id="productId">
+        <div class="field">
+          <label>Product name</label>
+          <input type="text" id="productName" required>
+        </div>
+        <div class="field">
+          <label>Amazon affiliate link</label>
+          <div style="display: flex; gap: 10px;">
+            <input type="url" id="productLink" placeholder="https://www.amazon.in/..." required style="flex: 1;">
+            <button type="button" class="btn btn-primary" id="autoFetchBtn">Fetch Data ⚡</button>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Category</label>
+            <select id="productCategory" required></select>
+          </div>
+          <div class="field">
+            <label>Badge (optional)</label>
+            <input type="text" id="productBadge" placeholder="Deal, New, Bestseller...">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Price (₹)</label>
+            <input type="number" id="productPrice" min="0" required>
+          </div>
+          <div class="field">
+            <label>Original price (₹)</label>
+            <input type="number" id="productOriginalPrice" min="0">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Rating (0–5)</label>
+            <input type="number" id="productRating" min="0" max="5" step="0.1">
+          </div>
+          <div class="field">
+            <label>Review count</label>
+            <input type="number" id="productReviews" min="0">
+          </div>
+        </div>
+        <div class="field">
+          <label>Image URL</label>
+          <input type="url" id="productImage" placeholder="https://...">
+        </div>
+
+        <div class="field">
+          <label>Description (optional)</label>
+          <textarea id="productDescription"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="productCancelBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CATEGORY MODAL -->
+  <div class="modal-overlay" id="categoryModalOverlay" style="display:none;">
+    <div class="modal">
+      <h3 id="categoryModalTitle">Add category</h3>
+      <form id="categoryForm">
+        <input type="hidden" id="categoryId">
+        <div class="field-row">
+          <div class="field">
+            <label>Icon (emoji)</label>
+            <input type="text" id="categoryIcon" placeholder="🔌" maxlength="4">
+          </div>
+          <div class="field">
+            <label>Name</label>
+            <input type="text" id="categoryName" required>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="categoryCancelBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save category</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/admin.js"></script>
+  <script>document.getElementById("autoFetchBtn").addEventListener("click", async () => {
+      const urlInput = document.getElementById("productLink").value.trim();
+
+      if (!urlInput || !urlInput.includes("amazon")) {
+        showToast("Please enter a valid Amazon link first!");
+        return;
+      }
+
+      const btn = document.getElementById("autoFetchBtn");
+      const originalText = btn.textContent;
+
+      // लोडिंग स्टेट दिखाएं
+      btn.textContent = "Fetching... ⏳";
+      btn.disabled = true;
+      btn.style.opacity = "0.7";
+
+      try {
+        // हमारे लोकल बैकएंड सर्वर (Port 5000) को रिक्वेस्ट भेजें
+        const response = await fetch("http://localhost:5000/api/fetch-amazon", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ url: urlInput })
+        });
+        const data = await response.json();
+
+        if (data.error) {
+          showToast(data.error);
+        } else {
+          // अगर डेटा मिल गया, तो उसे इनपुट बॉक्स में भर दें
+          document.getElementById("productName").value = data.title || "";
+          document.getElementById("productPrice").value = data.price || "";
+          document.getElementById("productImage").value = data.image || "";
+          showToast("Data fetched successfully! 🎉");
+        }
+      } catch (error) {
+        console.error("Fetch Error:", error);
+        showToast("Server is not running or connection failed.");
+      } finally {
+        // बटन को वापस नार्मल करें
+        btn.textContent = originalText;
+        btn.disabled = false;
+        btn.style.opacity = "1";
+      }
+    });
+  </script>
+</body>
+
+</html>
