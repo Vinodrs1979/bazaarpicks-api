@@ -1,10 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-
-// Stealth Mode Setup (Amazon को असली इंसान दिखाने के लिए)
-const puppeteer = require('puppeteer-extra');
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-puppeteer.use(StealthPlugin());
+const axios = require('axios');
+const cheerio = require('cheerio');
 
 const app = express();
 app.use(cors());
@@ -18,43 +15,38 @@ app.post('/api/fetch-amazon', async (req, res) => {
     }
 
     try {
-        console.log("Fetching data with Stealth Mode... Please wait.");
+        console.log("Fetching data via ScraperAPI...");
 
-        // Render के सर्वर के लिए खास सेटिंग्स
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
-        });
+        // यहाँ अपनी ScraperAPI Key डालें
+        const SCRAPER_API_KEY = 'ccea13e27fdead232551758c4fa28b0e';
 
-        const page = await browser.newPage();
+        // ScraperAPI के ज़रिए Amazon को रिक्वेस्ट भेजना
+        const targetUrl = encodeURIComponent(url);
+        const scraperUrl = `http://api.scraperapi.com?api_key=${SCRAPER_API_KEY}&url=${targetUrl}`;
 
-        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36');
+        const response = await axios.get(scraperUrl);
+        const html = response.data;
 
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+        // Cheerio से HTML को पढ़ना (यह Puppeteer से बहुत तेज़ है)
+        const $ = cheerio.load(html);
 
-        const productData = await page.evaluate(() => {
-            const title = document.querySelector('#productTitle')?.innerText.trim() || "Title not found";
+        const title = $('#productTitle').text().trim() || "Title not found";
 
-            let priceText = document.querySelector('.a-price-whole')?.innerText || "0";
-            let price = Number(priceText.replace(/,/g, '').replace(/\./g, ''));
+        let priceText = $('.a-price-whole').first().text() || "0";
+        let price = Number(priceText.replace(/,/g, '').replace(/\./g, ''));
 
-            const image = document.querySelector('#landingImage')?.src || document.querySelector('#imgTagWrapperId img')?.src || "";
+        const image = $('#landingImage').attr('src') || $('#imgTagWrapperId img').attr('src') || "";
 
-            return { title, price, image };
-        });
-
-        await browser.close();
-        console.log("Success:", productData);
-
-        res.json(productData);
+        console.log("Success:", { title, price, image });
+        res.json({ title, price, image });
 
     } catch (error) {
-        console.error("Scraping Error:", error);
-        res.status(500).json({ error: "Failed to fetch data. Amazon might have blocked the request." });
+        console.error("Scraping Error:", error.message);
+        res.status(500).json({ error: "Failed to fetch data. ScraperAPI might have failed." });
     }
 });
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`🚀 Stealth Server running on port ${PORT}`);
+    console.log(`🚀 Fast API Server running on port ${PORT}`);
 });
