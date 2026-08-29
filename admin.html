@@ -243,7 +243,7 @@
 
       try {
         // हमारे लोकल बैकएंड सर्वर (Port 5000) को रिक्वेस्ट भेजें
-        const response = await fetch("http://localhost:5000/api/fetch-amazon", {
+        const response = await fetch("https://bazaarpicks-api.onrender.com/api/fetch-amazon", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -252,7 +252,7 @@
         });
         const data = await response.json();
 
-        if (data.error) {
+        if (data.error) {C
           showToast(data.error);
         } else {
           // अगर डेटा मिल गया, तो उसे इनपुट बॉक्स में भर दें

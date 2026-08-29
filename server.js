@@ -1,7 +1,12 @@
 const express = require('express');
 const cors = require('cors');
-const puppeteer = require('puppeteer');
+const express = require('express');
+const cors = require('cors');
 
+// Stealth Mode Code
+const puppeteer = require('puppeteer-extra');
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+puppeteer.use(StealthPlugin());
 const app = express();
 app.use(cors());
 app.use(express.json()); // Frontend से JSON डेटा लेने के लिए
