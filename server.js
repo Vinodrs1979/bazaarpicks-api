@@ -18,7 +18,7 @@ mongoose.connect(MONGO_URI)
     .catch(err => console.error("MongoDB Error:", err));
 
 // ==========================================
-// 2. DATABASE SCHEMAS (डेटा का स्ट्रक्चर)
+// 2. DATABASE SCHEMAS
 // ==========================================
 const Product = mongoose.model('Product', new mongoose.Schema({
     name: String, link: String, category: String, price: Number, image: String
@@ -26,7 +26,7 @@ const Product = mongoose.model('Product', new mongoose.Schema({
 const Category = mongoose.model('Category', new mongoose.Schema({ name: String }));
 
 // ==========================================
-// 3. AMAZON SCRAPER API
+// 3. AMAZON SCRAPER API (Auto-Category Added)
 // ==========================================
 app.post('/api/fetch-amazon', async (req, res) => {
     const { url } = req.body;
@@ -41,9 +41,9 @@ app.post('/api/fetch-amazon', async (req, res) => {
         let price = Number(priceText.replace(/,/g, '').replace(/\./g, ''));
         const image = $('#landingImage').attr('src') || $('#imgTagWrapperId img').attr('src') || "";
         
-        // Amazon की मुख्य कैटेगरी (Top-level Category) निकालना
+        // Amazon से कैटेगरी निकालना
         let category = $('#wayfinding-breadcrumbs_feature_div ul li:first-child a').text().trim();
-        if(!category) category = "Uncategorized"; // अगर कैटेगरी ना मिले
+        if(!category) category = "Uncategorized";
         
         res.json({ title, price, image, category });
     } catch (error) {
@@ -52,7 +52,7 @@ app.post('/api/fetch-amazon', async (req, res) => {
 });
 
 // ==========================================
-// 4. DATABASE ROUTES (Frontend से बात करने के लिए)
+// 4. DATABASE ROUTES
 // ==========================================
 app.get('/api/products', async (req, res) => res.json(await Product.find()));
 app.post('/api/products', async (req, res) => res.json(await new Product(req.body).save()));
