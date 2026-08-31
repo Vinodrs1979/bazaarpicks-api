@@ -33,7 +33,7 @@ app.post('/api/fetch-amazon', async (req, res) => {
     const { url } = req.body;
     
     // ध्यान दें: नीचे अपनी ScraperAPI की 32 अक्षरों वाली Key डालें
-    const SCRAPER_API_KEY = 'यहाँ_अपनी_SCRAPER_API_KEY_डालें'; 
+    const SCRAPER_API_KEY = 'ccea13e27fdead232551758c4fa28b0e'; 
     
     try {
         const response = await axios.get(`http://api.scraperapi.com?api_key=${SCRAPER_API_KEY}&url=${encodeURIComponent(url)}`);
