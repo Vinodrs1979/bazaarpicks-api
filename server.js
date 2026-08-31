@@ -41,7 +41,11 @@ app.post('/api/fetch-amazon', async (req, res) => {
         let price = Number(priceText.replace(/,/g, '').replace(/\./g, ''));
         const image = $('#landingImage').attr('src') || $('#imgTagWrapperId img').attr('src') || "";
         
-        res.json({ title, price, image });
+        // Amazon की मुख्य कैटेगरी (Top-level Category) निकालना
+        let category = $('#wayfinding-breadcrumbs_feature_div ul li:first-child a').text().trim();
+        if(!category) category = "Uncategorized"; // अगर कैटेगरी ना मिले
+        
+        res.json({ title, price, image, category });
     } catch (error) {
         res.status(500).json({ error: "Failed to fetch data." });
     }
