@@ -12,7 +12,7 @@ app.use(express.json());
 // 1. MONGODB DATABASE CONNECTION
 // ==========================================
 // ध्यान दें: नीचे अपना असली MongoDB लिंक डालें (पासवर्ड के साथ)
-const MONGO_URI = "mongodb+srv://vrsapplications_db_user:Tc5xuE80F79m3xha@cluster0.abcde.mongodb.net/?retryWrites=true&w=majority";
+mongodb+srv://vrsapplications_db_user:Tc5xuE8OF79m3xha@cluster0.skplavv.mongodb.net/?appName=Cluster0
 
 mongoose.connect(MONGO_URI)
     .then(() => console.log("✅ MongoDB Connected Successfully!"))
