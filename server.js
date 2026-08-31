@@ -11,7 +11,7 @@ app.use(express.json());
 // ==========================================
 // 1. MONGODB DATABASE CONNECTION
 // ==========================================
-const MONGO_URI = "mongodb+srv://vrsapplications_db_user:Tc5xuE80F79m3xha@cluster0.skplavv.mongodb.net/bazaarpicks?retryWrites=true&w=majority";
+const MONGO_URI = "mongodb+srv://vrsapplications_db_user:bazaar12345@cluster0.skplavv.mongodb.net/bazaarpicks?retryWrites=true&w=majority";
 
 mongoose.connect(MONGO_URI)
     .then(() => console.log("✅ MongoDB Connected Successfully!"))
