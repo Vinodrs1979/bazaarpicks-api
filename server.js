@@ -11,8 +11,7 @@ app.use(express.json());
 // ==========================================
 // 1. MONGODB DATABASE CONNECTION
 // ==========================================
-// यहाँ डबल कोट्स और 'const MONGO_URI =' लगाना ज़रूरी था। पासवर्ड में 'O' को '0' कर दिया गया है।
-const MONGO_URI = "mongodb+srv://vrsapplications_db_user:Tc5xuE80F79m3xha@cluster0.skplavv.mongodb.net/?appName=Cluster0";
+const MONGO_URI = "mongodb+srv://vrsapplications_db_user:Tc5xuE80F79m3xha@cluster0.skplavv.mongodb.net/bazaarpicks?retryWrites=true&w=majority";
 
 mongoose.connect(MONGO_URI)
     .then(() => console.log("✅ MongoDB Connected Successfully!"))
@@ -31,7 +30,6 @@ const Category = mongoose.model('Category', new mongoose.Schema({ name: String }
 // ==========================================
 app.post('/api/fetch-amazon', async (req, res) => {
     const { url } = req.body;
-    
     const SCRAPER_API_KEY = 'ccea13e27fdead232551758c4fa28b0e'; 
     
     try {
