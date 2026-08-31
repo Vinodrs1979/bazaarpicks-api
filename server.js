@@ -11,8 +11,8 @@ app.use(express.json());
 // ==========================================
 // 1. MONGODB DATABASE CONNECTION
 // ==========================================
-// ध्यान दें: नीचे अपना असली MongoDB लिंक डालें (पासवर्ड के साथ)
-mongodb+srv://vrsapplications_db_user:Tc5xuE8OF79m3xha@cluster0.skplavv.mongodb.net/?appName=Cluster0
+// यहाँ डबल कोट्स और 'const MONGO_URI =' लगाना ज़रूरी था। पासवर्ड में 'O' को '0' कर दिया गया है।
+const MONGO_URI = "mongodb+srv://vrsapplications_db_user:Tc5xuE80F79m3xha@cluster0.skplavv.mongodb.net/?appName=Cluster0";
 
 mongoose.connect(MONGO_URI)
     .then(() => console.log("✅ MongoDB Connected Successfully!"))
@@ -32,7 +32,6 @@ const Category = mongoose.model('Category', new mongoose.Schema({ name: String }
 app.post('/api/fetch-amazon', async (req, res) => {
     const { url } = req.body;
     
-    // ध्यान दें: नीचे अपनी ScraperAPI की 32 अक्षरों वाली Key डालें
     const SCRAPER_API_KEY = 'ccea13e27fdead232551758c4fa28b0e'; 
     
     try {
