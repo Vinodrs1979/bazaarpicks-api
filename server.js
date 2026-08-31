@@ -11,43 +11,39 @@ app.use(express.json());
 // ==========================================
 // 1. MONGODB DATABASE CONNECTION
 // ==========================================
-// यहाँ अपना कॉपी किया हुआ MongoDB का लिंक डालें (पासवर्ड के साथ)
-const MONGO_URL = "mongodb+srv://vrsapplications_db_user:अपना_असली_पासवर्ड_यहाँ_डालें@cluster0.abcde.mongodb.net/BazaarPicks?retryWrites=true&w=majority";
+// ध्यान दें: नीचे अपना असली MongoDB लिंक डालें (पासवर्ड के साथ)
+const MONGO_URI = "यहाँ_अपना_MONGODB_LINK_डालें";
 
-mongoose.connect(MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => console.log('✅ MongoDB Database Connected!'))
-    .catch((err) => console.error('❌ Database Connection Error:', err));
-
-// Product Schema (डेटाबेस में प्रोडक्ट कैसा दिखेगा)
-const productSchema = new mongoose.Schema({
-    name: String,
-    link: String,
-    category: String,
-    price: Number,
-    image: String
-});
-const Product = mongoose.model('Product', productSchema);
+mongoose.connect(MONGO_URI)
+    .then(() => console.log("✅ MongoDB Connected Successfully!"))
+    .catch(err => console.error("MongoDB Error:", err));
 
 // ==========================================
-// 2. SCRAPER API (Amazon Data Fetching)
+// 2. DATABASE SCHEMAS (डेटा का स्ट्रक्चर)
+// ==========================================
+const Product = mongoose.model('Product', new mongoose.Schema({
+    name: String, link: String, category: String, price: Number, image: String
+}));
+const Category = mongoose.model('Category', new mongoose.Schema({ name: String }));
+
+// ==========================================
+// 3. AMAZON SCRAPER API
 // ==========================================
 app.post('/api/fetch-amazon', async (req, res) => {
     const { url } = req.body;
-    if (!url || !url.includes('amazon')) return res.status(400).json({ error: "Invalid URL" });
-
+    
+    // ध्यान दें: नीचे अपनी ScraperAPI की 32 अक्षरों वाली Key डालें
+    const SCRAPER_API_KEY = 'यहाँ_अपनी_SCRAPER_API_KEY_डालें'; 
+    
     try {
-        // यहाँ अपनी 32 अक्षरों वाली ScraperAPI Key डालें
-        const SCRAPER_API_KEY = 'यहाँ_अपनी_SCRAPER_API_KEY_डालें';
-        const scraperUrl = `http://api.scraperapi.com?api_key=${SCRAPER_API_KEY}&url=${encodeURIComponent(url)}`;
-
-        const response = await axios.get(scraperUrl);
+        const response = await axios.get(`http://api.scraperapi.com?api_key=${SCRAPER_API_KEY}&url=${encodeURIComponent(url)}`);
         const $ = cheerio.load(response.data);
-
+        
         const title = $('#productTitle').text().trim() || "Title not found";
         let priceText = $('.a-price-whole').first().text() || "0";
         let price = Number(priceText.replace(/,/g, '').replace(/\./g, ''));
         const image = $('#landingImage').attr('src') || $('#imgTagWrapperId img').attr('src') || "";
-
+        
         res.json({ title, price, image });
     } catch (error) {
         res.status(500).json({ error: "Failed to fetch data." });
@@ -55,41 +51,21 @@ app.post('/api/fetch-amazon', async (req, res) => {
 });
 
 // ==========================================
-// 3. DATABASE APIs (CRUD Operations)
+// 4. DATABASE ROUTES (Frontend से बात करने के लिए)
 // ==========================================
-
-// सभी प्रोडक्ट्स मँगाना (GET)
-app.get('/api/products', async (req, res) => {
-    try {
-        const products = await Product.find();
-        res.json(products);
-    } catch (error) {
-        res.status(500).json({ error: "Failed to get products" });
-    }
-});
-
-// नया प्रोडक्ट सेव करना (POST)
-app.post('/api/products', async (req, res) => {
-    try {
-        const newProduct = new Product(req.body);
-        await newProduct.save();
-        res.json({ message: "Product saved successfully!", product: newProduct });
-    } catch (error) {
-        res.status(500).json({ error: "Failed to save product" });
-    }
-});
-
-// प्रोडक्ट डिलीट करना (DELETE)
+app.get('/api/products', async (req, res) => res.json(await Product.find()));
+app.post('/api/products', async (req, res) => res.json(await new Product(req.body).save()));
 app.delete('/api/products/:id', async (req, res) => {
-    try {
-        await Product.findByIdAndDelete(req.params.id);
-        res.json({ message: "Product deleted!" });
-    } catch (error) {
-        res.status(500).json({ error: "Failed to delete product" });
-    }
+    await Product.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+});
+
+app.get('/api/categories', async (req, res) => res.json(await Category.find()));
+app.post('/api/categories', async (req, res) => res.json(await new Category(req.body).save()));
+app.delete('/api/categories/:id', async (req, res) => {
+    await Category.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 API Server running on port ${PORT}`));
