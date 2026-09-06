@@ -30,7 +30,7 @@ const Category = mongoose.model('Category', new mongoose.Schema({ name: String }
 // ==========================================
 app.post('/api/fetch-amazon', async (req, res) => {
     const { url } = req.body;
-    // 🔥 यहाँ आपकी नई API Key डाल दी गई है
+    // 🔥 आपकी नई ScraperAPI Key
     const SCRAPER_API_KEY = 'db5177299cdcd5ae3d0ecb700777e06a'; 
     
     try {
@@ -53,22 +53,28 @@ app.post('/api/fetch-amazon', async (req, res) => {
 });
 
 // ==========================================
-// 4. DATABASE ROUTES (WITH MAKE.COM WEBHOOK)
+// 4. DATABASE ROUTES (WITH MAKE.COM WEBHOOK & PINTEREST FIX)
 // ==========================================
 app.get('/api/products', async (req, res) => res.json(await Product.find()));
 
-// Save Product + Trigger Make.com Webhook
+// 🔥 Save Product + Trigger Make.com Webhook (Pinterest Length Fix)
 app.post('/api/products', async (req, res) => {
     try {
         // 1. डेटाबेस (MongoDB) में प्रोडक्ट सेव करना
         const newProduct = new Product(req.body);
         await newProduct.save();
 
-        // 2. Make.com Webhook को डेटा भेजना
+        // 2. Pinterest के 100-character लिमिट के लिए नाम को सुरक्षित (छोटा) करना
+        let safeTitle = req.body.name;
+        if (safeTitle && safeTitle.length > 95) {
+            safeTitle = safeTitle.substring(0, 95) + "..."; // 95 अक्षरों के बाद ... लगा देगा
+        }
+
+        // 3. Make.com Webhook को डेटा भेजना
         const makeWebhookUrl = 'https://hook.eu1.make.com/9de8gb16jcgoltyz6zfod4glv1um6lt1';
         
         axios.post(makeWebhookUrl, {
-            productName: req.body.name,
+            productName: safeTitle, // यहाँ अब Pinterest के लिए सुरक्षित नाम जाएगा
             productLink: req.body.link,
             productImage: req.body.image,
             productPrice: req.body.price,
