@@ -52,10 +52,36 @@ app.post('/api/fetch-amazon', async (req, res) => {
 });
 
 // ==========================================
-// 4. DATABASE ROUTES
+// 4. DATABASE ROUTES (WITH MAKE.COM WEBHOOK)
 // ==========================================
 app.get('/api/products', async (req, res) => res.json(await Product.find()));
-app.post('/api/products', async (req, res) => res.json(await new Product(req.body).save()));
+
+// 🔥 UPDATED: Save Product + Trigger Make.com Webhook
+app.post('/api/products', async (req, res) => {
+    try {
+        // 1. डेटाबेस (MongoDB) में प्रोडक्ट सेव करना
+        const newProduct = new Product(req.body);
+        await newProduct.save();
+
+        // 2. Make.com Webhook को डेटा भेजना
+        const makeWebhookUrl = 'https://hook.eu1.make.com/9de8gb16jcgoltyz6zfod4glv1um6lt1';
+        
+        // हम यहाँ axios का उपयोग कर रहे हैं क्योंकि यह पहले से ही ऊपर require किया गया है
+        axios.post(makeWebhookUrl, {
+            productName: req.body.name,
+            productLink: req.body.link,
+            productImage: req.body.image,
+            productPrice: req.body.price,
+            productCategory: req.body.category
+        }).catch(err => console.log('Make.com Webhook Error:', err.message)); 
+
+        res.status(201).json(newProduct);
+    } catch (error) {
+        console.error("Error saving product:", error);
+        res.status(500).json({ error: "Failed to save product" });
+    }
+});
+
 app.delete('/api/products/:id', async (req, res) => {
     await Product.findByIdAndDelete(req.params.id);
     res.json({ success: true });
