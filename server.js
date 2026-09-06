@@ -30,7 +30,8 @@ const Category = mongoose.model('Category', new mongoose.Schema({ name: String }
 // ==========================================
 app.post('/api/fetch-amazon', async (req, res) => {
     const { url } = req.body;
-    const SCRAPER_API_KEY = 'ccea13e27fdead232551758c4fa28b0e'; 
+    // 🔥 यहाँ आपकी नई API Key डाल दी गई है
+    const SCRAPER_API_KEY = 'db5177299cdcd5ae3d0ecb700777e06a'; 
     
     try {
         const response = await axios.get(`http://api.scraperapi.com?api_key=${SCRAPER_API_KEY}&url=${encodeURIComponent(url)}`);
@@ -56,7 +57,7 @@ app.post('/api/fetch-amazon', async (req, res) => {
 // ==========================================
 app.get('/api/products', async (req, res) => res.json(await Product.find()));
 
-// 🔥 UPDATED: Save Product + Trigger Make.com Webhook
+// Save Product + Trigger Make.com Webhook
 app.post('/api/products', async (req, res) => {
     try {
         // 1. डेटाबेस (MongoDB) में प्रोडक्ट सेव करना
@@ -66,7 +67,6 @@ app.post('/api/products', async (req, res) => {
         // 2. Make.com Webhook को डेटा भेजना
         const makeWebhookUrl = 'https://hook.eu1.make.com/9de8gb16jcgoltyz6zfod4glv1um6lt1';
         
-        // हम यहाँ axios का उपयोग कर रहे हैं क्योंकि यह पहले से ही ऊपर require किया गया है
         axios.post(makeWebhookUrl, {
             productName: req.body.name,
             productLink: req.body.link,
